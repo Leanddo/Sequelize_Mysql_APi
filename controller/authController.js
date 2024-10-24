@@ -1,19 +1,20 @@
-const { Comments, User, Posts } = require("../model/social");
+const { User } = require("../model/social");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const secret = "sºdnfº+oindfSsf";
 
 exports.signUp = async (req, res) => {
   const { username, email, password } = req.body;
-  const hashpassword = bcrypt.hashSync(password, 10);
   try {
+    const hashedpassword = bcrypt.hashSync(password, 10);
     const createdUser = await User.create({
       username,
       email,
-      hashpassword,
+      password_hash: hashedpassword,
     });
     res.status(201).json(createdUser);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -22,27 +23,34 @@ exports.login = async (req, res) => {
   const { password, email } = req.body;
 
   try {
-    if (!password || !username) {
-      return res
-        .status(400)
-        .json({ message: "incorrect username or password" });
-    }
-    const hashpassword = await User.findAll({
+
+    const user = await User.findOne({
       where: {
         email: email,
       },
     });
-    if (bcrypt.compare(password, hashpassword)) {
-      jwt.sign(email, secret, { expiresIn: "1w" }, (err, token) => {
+
+    if (!password || !email || !user) {
+      return res
+        .status(400)
+        .json({ message: "incorrect username or email" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (isPasswordValid) {
+      jwt.sign({email:user.email}, secret, { expiresIn: "1w" }, (err, token) => {
         if (err) {
           console.error("Error generating JWT token", err);
         }
-        res.json(token);
+
+        res.json({token});
       });
     } else {
       res.status(401).json({ message: "Incorrect password or email" });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

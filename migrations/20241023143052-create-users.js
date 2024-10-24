@@ -16,17 +16,17 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true
       },
       password_hash: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       created_at: {
-        references: {
-          type: Sequelize.DATE,
-          defaultValue: Sequelize.NOW,
-        },
-      },
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },      
     });
   },
 

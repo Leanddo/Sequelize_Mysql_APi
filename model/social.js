@@ -1,7 +1,7 @@
 const sequelize = require("sequelize");
 const db = require("../config/database");
 
-const User = db.define("User", {
+const User = db.define("users", {
   user_id: {
     type: sequelize.INTEGER,
     primaryKey: true,
@@ -14,6 +14,7 @@ const User = db.define("User", {
   email: {
     type: sequelize.STRING,
     allowNull: false,
+    unique: true
   },
   password_hash: {
     type: sequelize.STRING,
@@ -25,7 +26,7 @@ const User = db.define("User", {
   },
 });
 
-const Posts = db.define("Posts", {
+const Posts = db.define("posts", {
   post_id: {
     type: sequelize.INTEGER,
     primaryKey: true,
@@ -48,7 +49,7 @@ const Posts = db.define("Posts", {
   },
 });
 
-const Comments = db.define("Comments", {
+const Comments = db.define("comments", {
   comment_id: {
     type: sequelize.INTEGER,
     primaryKey: true,
