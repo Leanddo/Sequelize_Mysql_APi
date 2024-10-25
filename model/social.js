@@ -35,9 +35,14 @@ const Posts = db.define("posts", {
   user_id: {
     type: sequelize.INTEGER,
     references: {
-      model: "User", // Name of the table (or model) being referenced
-      key: "user_id", // Key in the referenced table (usually primary key)
+      model: "User", 
+      key: "user_id", 
     },
+  },
+  private:{
+    type: sequelize.BOOLEAN,
+    defaultValue: true,
+    allowNull: false,
   },
   content: {
     type: sequelize.TEXT,
@@ -49,6 +54,7 @@ const Posts = db.define("posts", {
   },
 });
 
+
 const Comments = db.define("comments", {
   comment_id: {
     type: sequelize.INTEGER,
@@ -58,15 +64,15 @@ const Comments = db.define("comments", {
   post_id: {
     type: sequelize.INTEGER,
     references: {
-      model: "Posts", // Name of the table (or model) being referenced
-      key: "post_id", // Key in the referenced table (usually primary key)
+      model: "Posts",
+      key: "post_id", 
     },
   },
   user_id: {
     type: sequelize.INTEGER,
     references: {
-      model: "User", // Name of the table (or model) being referenced
-      key: "user_id", // Key in the referenced table (usually primary key)
+      model: "User", 
+      key: "user_id", 
     },
   },
   comment_text: {
@@ -77,6 +83,19 @@ const Comments = db.define("comments", {
     type: sequelize.DATE,
     defaultValue: sequelize.NOW,
   },
+});
+
+// In Post model
+Posts.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Posts, { foreignKey: 'user_id' });
+
+Comments.belongsTo(Posts, {
+  foreignKey: 'post_id',
+  onDelete: 'CASCADE',
+});
+Comments.belongsTo(User, {
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
 });
 
 module.exports = {Comments,User,Posts}

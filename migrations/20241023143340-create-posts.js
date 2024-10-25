@@ -22,14 +22,15 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      private:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
     })
   },
-
-  async down (queryInterface, Sequelize) {
-    return queryInterface.dropTable("Posts");
-  }
 };

@@ -1,7 +1,7 @@
 const { User } = require("../model/social");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const secret = "sºdnfº+oindfSsf";
+require("dotenv").config();
 
 exports.signUp = async (req, res) => {
   const { username, email, password } = req.body;
@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (isPasswordValid) {
-      jwt.sign({email:user.email}, secret, { expiresIn: "1w" }, (err, token) => {
+      jwt.sign({user_id: user.user_id}, process.env.SECRET, { expiresIn: "1w" }, (err, token) => {
         if (err) {
           console.error("Error generating JWT token", err);
         }
@@ -55,7 +55,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.checkToken = (req, res) => {
+exports.checkToken = (req, res, next) => {
   const header = req.headers["authorization"];
 
   if (typeof header !== "undefined") {
@@ -67,7 +67,7 @@ exports.checkToken = (req, res) => {
     if (!token) {
       res.status(401).json({ message: "Authentication required." });
     }
-    jwt.verify(token, secret, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
         res.status(403).json({ message: "Invalid token" });
         return;
