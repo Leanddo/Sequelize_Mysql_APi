@@ -88,11 +88,42 @@ exports.deletePost = async (req, res) => {
     if (req.user.user_id == post_user_id.dataValues.user_id) {
       await Posts.destroy({
         where: {
-          post_id: post_id
+          post_id: post_id,
         },
       });
-      return res.status(204).json({message: "Deleted with success"});
-    }else{
+      return res.status(204).json({ message: "Deleted with success" });
+    } else {
+      return res.status(403).json({ message: "Unauthorized action" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "Error post not found" });
+  }
+};
+
+exports.updatePost = async (req, res) => {
+  try {
+    const post_id = req.params.id;
+    const { content, private } = req.body;
+    const post_user_id = await Posts.findOne({
+      attributes: ["user_id"],
+      where: {
+        post_id: post_id,
+      },
+    });
+    console.log(req.user.user_id, post_user_id.dataValues.user_id);
+    
+    if (req.user.user_id == post_user_id.dataValues.user_id) {
+      await Posts.update(
+        { content: content, private: private },
+        {
+          where: {
+            post_id: post_id,
+          },
+        }
+      );
+      return res.status(204).json({ message: "Deleted with success" });
+    } else {
       return res.status(403).json({ message: "Unauthorized action" });
     }
   } catch (error) {

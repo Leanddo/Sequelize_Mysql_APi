@@ -10,6 +10,7 @@ Router.route("/")
 
 Router.route("/:id")
   .get(postsController.getPostsId)
-  .delete(authController.checkToken, postsController.deletePost);
+  .delete(authController.checkToken, postsController.deletePost)
+  .put(authController.checkToken, postsController.updatePost);
 
 module.exports = Router;
