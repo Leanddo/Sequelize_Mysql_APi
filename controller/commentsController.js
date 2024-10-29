@@ -21,7 +21,7 @@ exports.createComment = async (req, res) => {
 };
 
 exports.getComment = async (req, res) => {
-  const comment_id = req.params.id;
+  const post_id = req.params.id;
 
   try {
     const getComments = await Comments.findAll({
@@ -33,7 +33,7 @@ exports.getComment = async (req, res) => {
         },
       ],
       where: {
-        comment_id: comment_id,
+        post_id: post_id,
       },
     });
     res.status(200).json(getComments);

@@ -3,7 +3,14 @@ const { Posts, User } = require("../model/social");
 
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await Posts.findAll();
+    const posts = await Posts.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ["username"],
+        },
+      ],
+    });
     res.status(200).json(posts);
   } catch (error) {
     console.error(error);
@@ -112,7 +119,7 @@ exports.updatePost = async (req, res) => {
       },
     });
     console.log(req.user.user_id, post_user_id.dataValues.user_id);
-    
+
     if (req.user.user_id == post_user_id.dataValues.user_id) {
       await Posts.update(
         { content: content, private: private },
