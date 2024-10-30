@@ -12,6 +12,20 @@ exports.signUp = async (req, res) => {
       email,
       password_hash: hashedpassword,
     });
+
+    const token = jwt.sign(
+      { userId: createdUser.user_id }, 
+      process.env.SECRET, 
+      { expiresIn: '1h' } 
+    );
+
+    res.cookie("authcookie", token, {
+      maxAge: 900000,
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+
     res.status(201).json(createdUser);
   } catch (error) {
     console.log(error);
