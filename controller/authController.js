@@ -14,7 +14,7 @@ exports.signUp = async (req, res) => {
     });
     res.status(201).json(createdUser);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -23,7 +23,6 @@ exports.login = async (req, res) => {
   const { password, email } = req.body;
 
   try {
-
     const user = await User.findOne({
       where: {
         email: email,
@@ -31,21 +30,30 @@ exports.login = async (req, res) => {
     });
 
     if (!password || !email || !user) {
-      return res
-        .status(400)
-        .json({ message: "incorrect username or email" });
+      return res.status(400).json({ message: "incorrect username or email" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (isPasswordValid) {
-      jwt.sign({user_id: user.user_id}, process.env.SECRET, { expiresIn: "1w" }, (err, token) => {
-        if (err) {
-          console.error("Error generating JWT token", err);
-        }
+      jwt.sign(
+        { user_id: user.user_id },
+        process.env.SECRET,
+        { expiresIn: "1w" },
+        (err, token) => {
+          if (err) {
+            console.error("Error generating JWT token", err);
+          }
 
-        res.json({token});
-      });
+          res.cookie("authcookie", token, {
+            maxAge: 900000,
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+          });
+          return res.status(200).json({ success: true });
+        }
+      );
     } else {
       res.status(401).json({ message: "Incorrect password or email" });
     }
@@ -56,12 +64,9 @@ exports.login = async (req, res) => {
 };
 
 exports.checkToken = (req, res, next) => {
-  const header = req.headers["authorization"];
+  const token = req.cookies.authcookie;
 
-  if (typeof header !== "undefined") {
-    const bearer = header.split(" ");
-    const token = bearer[1];
-
+  if (typeof token !== "undefined") {
     console.log("Extrated token: ", token);
 
     if (!token) {
