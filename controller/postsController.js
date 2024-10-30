@@ -1,5 +1,5 @@
 const { where } = require("sequelize");
-const { Posts, User } = require("../model/social");
+const { Posts, User, Comments } = require("../model/social");
 
 exports.getPosts = async (req, res) => {
   try {
@@ -93,6 +93,13 @@ exports.deletePost = async (req, res) => {
     });
 
     if (req.user.user_id == post_user_id.dataValues.user_id) {
+      
+      await Comments.destroy({
+        where: {
+          post_id: post_id,
+        },
+      });
+
       await Posts.destroy({
         where: {
           post_id: post_id,
